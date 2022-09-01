@@ -487,7 +487,7 @@ app.use(async (req, res, next) => {
                     typePermalink = await randomPermalink(mapPermalink);
                   }
                   try {
-                    let dom = new JSDOM(body, { virtualConsole }).window
+                    let dom = new JSDOM(body, { looseMode: true, virtualConsole }).window
                       .document;
                     await removeElement(dataSetting["element-remove"], dom);
                     await remakeUrlElement(dom, {
