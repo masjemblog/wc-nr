@@ -9,7 +9,8 @@ const serverless = require("serverless-http");
 const HttpAgent = require("agentkeepalive");
 const got = require("got");
 const app = express();
-const { JSDOM } = jsdom;
+const { JSDOM: JSDOM } = jsdom,
+  virtualConsole = new jsdom.VirtualConsole();
 
 const DEFAULT_USER_AGENT =
   "Mozilla/5.0 (Linux; Android 12; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Mobile Safari/537.36";
@@ -485,8 +486,14 @@ app.use(async (req, res, next) => {
                   if (typePermalink == null) {
                     typePermalink = await randomPermalink(mapPermalink);
                   }
-                  const cookieJar = new jsdom.CookieJar();
-                  let dom = new JSDOM(body, { cookieJar, looseMode: true }).window.document;
+                  const cookieJar = new jsdom.CookieJar("", {
+                    looseMode: true,
+                  });
+                  let dom = new JSDOM(body, {
+                    virtualConsole,
+                    cookieJar,
+                  }).window.document;
+                  console.log(dom);
                   await removeElement(dataSetting["element-remove"], dom);
                   await remakeUrlElement(dom, {
                     element: "link",
