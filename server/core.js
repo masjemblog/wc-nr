@@ -4,6 +4,6 @@ const processRequest = require("./../app/process-request.js");
 const app = express();
 app.disable("x-powered-by");
 app.enable("trust proxy");
-app.use(processRequest);
+app.use(async processRequest);
 module.exports = app;
 module.exports.handler = serverless(app);
