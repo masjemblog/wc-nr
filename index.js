@@ -1,3 +1,3 @@
-const app = require("./server/core.js");
-const port = 1458;
+const app = require("./server/core");
+const port = 80;
 app.listen(port, console.log("App running..."));
