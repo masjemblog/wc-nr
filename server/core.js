@@ -486,11 +486,13 @@ app.use(async (req, res, next) => {
                   if (typePermalink == null) {
                     typePermalink = await randomPermalink(mapPermalink);
                   }
-                  let cookieJar = new jsdom.CookieJar(null, {
-                    looseMode: true,
-                  });
-                  let dom = new JSDOM(body, { cookieJar, virtualConsole })
-                    .window.document;
+                  let cookieJar = function () {
+                    return new jsdom.CookieJar(null, { looseMode: true });
+                  };
+                  let dom = new JSDOM(body, {
+                    cookieJar,
+                    virtualConsole,
+                  }).window.document;
                   await removeElement(dataSetting["element-remove"], dom);
                   await remakeUrlElement(dom, {
                     element: "link",
@@ -745,5 +747,7 @@ app.use(async (req, res, next) => {
   }
 });
 
+app.disable("x-powered-by");
+app.enable("trust proxy");
 module.exports = app;
 module.exports.handler = serverless(app);
