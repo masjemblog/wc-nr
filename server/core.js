@@ -485,7 +485,8 @@ app.use(async (req, res, next) => {
                   if (typePermalink == null) {
                     typePermalink = await randomPermalink(mapPermalink);
                   }
-                  let dom = (new JSDOM(body)).window.document;
+                  const cookieJar = new jsdom.CookieJar();
+                  let dom = new JSDOM(body, { cookieJar }).window.document;
                   await removeElement(dataSetting["element-remove"], dom);
                   await remakeUrlElement(dom, {
                     element: "link",
