@@ -1,4 +1,4 @@
-const get = require("./http-client.js");
+const get = require("./http-client");
 
 const DEFAULT_USER_AGENT = `Mozilla/5.0 (compatible; allOrigins/${global.AO_VERSION}; +http://allorigins.win/)`;
 
