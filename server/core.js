@@ -9,7 +9,6 @@ const serverless = require("serverless-http");
 const HttpAgent = require("agentkeepalive");
 const got = require("got");
 const app = express();
-
 const { JSDOM: JSDOM } = jsdom,
   virtualConsole = new jsdom.VirtualConsole();
 
