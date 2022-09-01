@@ -1,4 +1,4 @@
-const getPage = require("./get-page.js");
+const getPage = require("./get-page");
 const { gzip } = require("node-gzip");
 const mime = require("mime-types");
 const jsdom = require("jsdom");
