@@ -737,7 +737,7 @@ app.use(async (req, res, next) => {
       res.end("404");
     }
   } catch (e) {
-    res.send(e.toString());
+    //
   }
 });
 
