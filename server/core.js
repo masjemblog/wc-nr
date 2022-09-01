@@ -1,4 +1,3 @@
-const getPage = require("./get-page");
 const { gzip } = require("node-gzip");
 const mime = require("mime-types");
 const jsdom = require("jsdom");
@@ -7,11 +6,15 @@ const removeHtmlComments = require("remove-html-comments");
 const fs = require("fs");
 const express = require("express");
 const serverless = require("serverless-http");
+const HttpAgent = require("agentkeepalive");
+const got = require("got");
 const app = express();
 
 const { JSDOM: JSDOM } = jsdom,
   virtualConsole = new jsdom.VirtualConsole();
 
+const DEFAULT_USER_AGENT =
+  "Mozilla/5.0 (Linux; Android 12; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Mobile Safari/537.36";
 let headerDafult = {
   "User-Agent": 'Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90',
   referer: "https://www.google.com",
@@ -23,6 +26,49 @@ const isUrl = (url) => {
     return true;
   } catch (e) {
     return false;
+  }
+};
+
+const get = async (data) => {
+  const gotOptions = {
+    agent: {
+      http: new HttpAgent({
+        keepAlive: true,
+      }),
+      https: new HttpAgent.HttpsAgent({
+        keepAlive: true,
+      }),
+    },
+    responseType: data.type,
+    dnsCache: true,
+    headers: { "user-agent": data.ua, referer: "https://www.google.com" },
+  };
+
+  return got(data.url, gotOptions);
+};
+
+const getPage = async (url, ua, type) => {
+  try {
+    if (ua == null) {
+      ua = DEFAULT_USER_AGENT;
+    }
+    const data = {
+      url: url,
+      ua: ua,
+      type: type,
+    };
+    const page = await get(data);
+    if (page.statusCode == 200) {
+      return {
+        headers: page.headers,
+        content: page.body,
+        code: page.statusCode,
+      };
+    } else {
+      return "err";
+    }
+  } catch (e) {
+    return "err";
   }
 };
 
