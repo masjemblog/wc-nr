@@ -486,168 +486,177 @@ app.use(async (req, res, next) => {
                   if (typePermalink == null) {
                     typePermalink = await randomPermalink(mapPermalink);
                   }
-                  const cookieJar = new jsdom.CookieJar("", {
-                    looseMode: true,
-                  });
-                  let dom = new JSDOM(body, {
-                    virtualConsole,
-                    cookieJar,
-                  }).window.document;
-                  console.log(dom);
-                  await removeElement(dataSetting["element-remove"], dom);
-                  await remakeUrlElement(dom, {
-                    element: "link",
-                    target: "href",
-                    remake: "href",
-                    origin: originUrl,
-                    proto: proto,
-                    url: origin,
-                    hostname: parseUrl(dataSetting["target"]).hostname,
-                    permalink: typePermalink,
-                    scp: statusCostomPermalink,
-                  });
-                  await remakeUrlElement(dom, {
-                    element: "a",
-                    target: "href",
-                    remake: "href",
-                    origin: originUrl,
-                    proto: proto,
-                    url: origin,
-                    hostname: parseUrl(dataSetting["target"]).hostname,
-                    permalink: typePermalink,
-                    scp: statusCostomPermalink,
-                  });
-                  await remakeUrlElement(dom, {
-                    element: "img",
-                    target: "src",
-                    remake: "src",
-                    origin: originUrl,
-                    proto: proto,
-                    url: origin,
-                    hostname: parseUrl(dataSetting["target"]).hostname,
-                    permalink: typePermalink,
-                    scp: statusCostomPermalink,
-                  });
-                  await remakeUrlElement(dom, {
-                    element: "img",
-                    target: "data-src",
-                    remake: "src",
-                    origin: originUrl,
-                    proto: proto,
-                    url: origin,
-                    hostname: parseUrl(dataSetting["target"]).hostname,
-                    permalink: typePermalink,
-                    scp: statusCostomPermalink,
-                  });
-                  dataSetting["inject-element-head"]
-                    .reverse()
-                    .forEach(function (a) {
-                      let createEl = dom.createElement(a["name-element"]);
-                      a["data-attribute"].forEach(function (b) {
-                        createEl.setAttribute(
-                          b["name-attribute"],
-                          b["value-attribute"]
-                        );
-                      });
-                      createEl.innerHTML = a["data-innerHTML"];
-                      if (a["position"] == "start") {
-                        dom.head.insertBefore(createEl, dom.head.firstChild);
-                      } else {
-                        dom.head.appendChild(createEl);
-                      }
+                  try {
+                    let dom = new JSDOM(body, { virtualConsole }).window
+                      .document;
+                    await removeElement(dataSetting["element-remove"], dom);
+                    await remakeUrlElement(dom, {
+                      element: "link",
+                      target: "href",
+                      remake: "href",
+                      origin: originUrl,
+                      proto: proto,
+                      url: origin,
+                      hostname: parseUrl(dataSetting["target"]).hostname,
+                      permalink: typePermalink,
+                      scp: statusCostomPermalink,
                     });
-                  dataSetting["inject-element-body"]
-                    .reverse()
-                    .forEach(function (a) {
-                      let createEl = dom.createElement(a["name-element"]);
-                      a["data-attribute"].forEach(function (b) {
-                        createEl.setAttribute(
-                          b["name-attribute"],
-                          b["value-attribute"]
-                        );
-                      });
-                      createEl.innerHTML = a["data-innerHTML"];
-                      if (a["position"] == "start") {
-                        dom.body.insertBefore(createEl, dom.body.firstChild);
-                      } else {
-                        dom.body.appendChild(createEl);
-                      }
+                    await remakeUrlElement(dom, {
+                      element: "a",
+                      target: "href",
+                      remake: "href",
+                      origin: originUrl,
+                      proto: proto,
+                      url: origin,
+                      hostname: parseUrl(dataSetting["target"]).hostname,
+                      permalink: typePermalink,
+                      scp: statusCostomPermalink,
                     });
-                  let dataTitle = dom.title;
-                  dom.querySelectorAll("title").forEach(function (a) {
-                    a.remove();
-                  });
-                  let createTitle = dom.createElement("title");
-                  createTitle.innerHTML = dataTitle;
-                  dom.head.insertBefore(createTitle, dom.head.firstChild);
-                  let domBody = dom.body.outerHTML;
-                  let dataReplace = [];
-                  dataSetting["costom-element-remove"].forEach(function (a) {
-                    if (a.target == hostname) {
-                      a["element-remove-selector"].forEach(function (b) {
-                        dom.querySelectorAll(b).forEach(function (c) {
-                          c.remove();
+                    await remakeUrlElement(dom, {
+                      element: "img",
+                      target: "src",
+                      remake: "src",
+                      origin: originUrl,
+                      proto: proto,
+                      url: origin,
+                      hostname: parseUrl(dataSetting["target"]).hostname,
+                      permalink: typePermalink,
+                      scp: statusCostomPermalink,
+                    });
+                    await remakeUrlElement(dom, {
+                      element: "img",
+                      target: "data-src",
+                      remake: "src",
+                      origin: originUrl,
+                      proto: proto,
+                      url: origin,
+                      hostname: parseUrl(dataSetting["target"]).hostname,
+                      permalink: typePermalink,
+                      scp: statusCostomPermalink,
+                    });
+                    dataSetting["inject-element-head"]
+                      .reverse()
+                      .forEach(function (a) {
+                        let createEl = dom.createElement(a["name-element"]);
+                        a["data-attribute"].forEach(function (b) {
+                          createEl.setAttribute(
+                            b["name-attribute"],
+                            b["value-attribute"]
+                          );
                         });
+                        createEl.innerHTML = a["data-innerHTML"];
+                        if (a["position"] == "start") {
+                          dom.head.insertBefore(createEl, dom.head.firstChild);
+                        } else {
+                          dom.head.appendChild(createEl);
+                        }
                       });
-                      dataReplace = a["replace-string"];
-                    }
-                  });
-                  let textBody = dom.documentElement.querySelector("body");
-                  if (textBody == null) {
-                    textBody = "";
-                  } else {
-                    textBody = textBody.textContent;
-                  }
-                  let dataDescription = [];
-                  for (var i = 0; i < 10; i++) {
-                    textBody = textBody
-                      .replace(/\n/g, "")
-                      .replace(/[`~!@#$%^&*()_\-+=\[\]{};:'"\\|\/<>?\s]/g, " ")
-                      .replace(/  /g, " ");
-                  }
-                  textBody = textBody.split(" ");
-                  textBody.forEach(function (a, i) {
-                    if (a.length >= 3) {
-                      if (i > 10 && i < 50) {
-                        dataDescription.push(a);
+                    dataSetting["inject-element-body"]
+                      .reverse()
+                      .forEach(function (a) {
+                        let createEl = dom.createElement(a["name-element"]);
+                        a["data-attribute"].forEach(function (b) {
+                          createEl.setAttribute(
+                            b["name-attribute"],
+                            b["value-attribute"]
+                          );
+                        });
+                        createEl.innerHTML = a["data-innerHTML"];
+                        if (a["position"] == "start") {
+                          dom.body.insertBefore(createEl, dom.body.firstChild);
+                        } else {
+                          dom.body.appendChild(createEl);
+                        }
+                      });
+                    let dataTitle = dom.title;
+                    dom.querySelectorAll("title").forEach(function (a) {
+                      a.remove();
+                    });
+                    let createTitle = dom.createElement("title");
+                    createTitle.innerHTML = dataTitle;
+                    dom.head.insertBefore(createTitle, dom.head.firstChild);
+                    let domBody = dom.body.outerHTML;
+                    let dataReplace = [];
+                    dataSetting["costom-element-remove"].forEach(function (a) {
+                      if (a.target == hostname) {
+                        a["element-remove-selector"].forEach(function (b) {
+                          dom.querySelectorAll(b).forEach(function (c) {
+                            c.remove();
+                          });
+                        });
+                        dataReplace = a["replace-string"];
                       }
+                    });
+                    let textBody = dom.documentElement.querySelector("body");
+                    if (textBody == null) {
+                      textBody = "";
+                    } else {
+                      textBody = textBody.textContent;
                     }
-                  });
-                  if (dataDescription.length > 0) {
-                    dataDescription = dataDescription.join(" ");
-                  } else {
-                    dataDescription = "";
-                  }
-                  dom = dom.documentElement.outerHTML;
-                  if (dataSetting["remove-comment-html"]) {
-                    removeHtmlComments(domBody).comments.forEach(function (a) {
-                      dom = dom.replace(a, "");
+                    let dataDescription = [];
+                    for (var i = 0; i < 10; i++) {
+                      textBody = textBody
+                        .replace(/\n/g, "")
+                        .replace(
+                          /[`~!@#$%^&*()_\-+=\[\]{};:'"\\|\/<>?\s]/g,
+                          " "
+                        )
+                        .replace(/  /g, " ");
+                    }
+                    textBody = textBody.split(" ");
+                    textBody.forEach(function (a, i) {
+                      if (a.length >= 3) {
+                        if (i > 10 && i < 50) {
+                          dataDescription.push(a);
+                        }
+                      }
                     });
-                  }
-                  dataReplace.forEach(function (a) {
-                    dom = dom.replace(a.target, a.replace);
-                  });
-                  dom = dom.replace(/\$\{titlePost\}/g, dataTitle);
-                  dom = dom.replace(/\$\{urlPost\}/g, fullUrl);
-                  dom = dom.replace(/\$\{nameWeb\}/g, dataSetting["name-web"]);
-                  dom = dom.replace(
-                    /\$\{timePublish\}/g,
-                    new Date().toISOString()
-                  );
-                  dom = dom.replace(/\$\{authorPost\}/g, dataSetting["author"]);
-                  dom = dom.replace(
-                    /\$\{descriptionPost\}/g,
-                    dataDescription + "..."
-                  );
-                  dom = "<!DOCTYPE html>" + dom;
-                  gzip(dom)
-                    .then((compressed) => {
-                      res.write(compressed);
-                      res.end();
-                    })
-                    .catch(function (e) {
-                      res.end("404");
+                    if (dataDescription.length > 0) {
+                      dataDescription = dataDescription.join(" ");
+                    } else {
+                      dataDescription = "";
+                    }
+                    dom = dom.documentElement.outerHTML;
+                    if (dataSetting["remove-comment-html"]) {
+                      removeHtmlComments(domBody).comments.forEach(function (
+                        a
+                      ) {
+                        dom = dom.replace(a, "");
+                      });
+                    }
+                    dataReplace.forEach(function (a) {
+                      dom = dom.replace(a.target, a.replace);
                     });
+                    dom = dom.replace(/\$\{titlePost\}/g, dataTitle);
+                    dom = dom.replace(/\$\{urlPost\}/g, fullUrl);
+                    dom = dom.replace(
+                      /\$\{nameWeb\}/g,
+                      dataSetting["name-web"]
+                    );
+                    dom = dom.replace(
+                      /\$\{timePublish\}/g,
+                      new Date().toISOString()
+                    );
+                    dom = dom.replace(
+                      /\$\{authorPost\}/g,
+                      dataSetting["author"]
+                    );
+                    dom = dom.replace(
+                      /\$\{descriptionPost\}/g,
+                      dataDescription + "..."
+                    );
+                    dom = "<!DOCTYPE html>" + dom;
+                    gzip(dom)
+                      .then((compressed) => {
+                        res.write(compressed);
+                        res.end();
+                      })
+                      .catch(function (e) {
+                        res.end("404");
+                      });
+                  } catch (e) {
+                    //
+                  }
                 }
               } else {
                 if (codeContent == 404) {
