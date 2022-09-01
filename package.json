@@ -21,6 +21,6 @@
     "url-parse": "^1.5.10"
   },
   "devDependencies": {
-    "netlify-lambda": "^2.0.15"
+    "netlify-lambda": "^0.4.0"
   }
 }
