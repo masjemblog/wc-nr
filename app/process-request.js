@@ -5,6 +5,9 @@ const jsdom = require("jsdom");
 const parseUrl = require("url-parse");
 const removeHtmlComments = require("remove-html-comments");
 const fs = require("fs");
+const express = require("express");
+const serverless = require("serverless-http");
+const app = express();
 
 const { JSDOM: JSDOM } = jsdom,
   virtualConsole = new jsdom.VirtualConsole();
@@ -202,8 +205,7 @@ const remakeUrlElement = async (dom, option) => {
   });
 };
 
-const processRequest = async (req, res) => {
-  //--- handle send response vercel (01) --
+app.use(async (req, res, next) => {
   if (!res.status) {
     res.status = (input) => {
       res.writeHead(input);
@@ -692,6 +694,7 @@ const processRequest = async (req, res) => {
   } catch (e) {
     res.send(e.toString());
   }
-};
+});
 
-module.exports = processRequest;
+module.exports = app;
+module.exports.handler = serverless(app);
